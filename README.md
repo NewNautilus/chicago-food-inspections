@@ -1,103 +1,94 @@
-[Chicago Food Inspections](https://apify.com/fortuitous_pirate/chicago-food-inspections?fpr=data)
+[Chicago Food Inspections](https://apify.com/clawdeus/chicago-food-inspections?fpr=data)
 
-# Chicago Food Inspections
+# Chicago Food Inspections Scraper
 
-## Overview
-
-Fetch food inspection data from Chicago's Socrata Open Data API. Supports filters (Facility Type, Start Date, End Date).
+Get comprehensive Chicago restaurant inspection data including violations, ratings, and business details. Perfect for compliance monitoring, market research, and consumer protection. Updated daily from the official Chicago Open Data Portal.
 
 ## Features
 
-- Search by keywords to find specific results
-- Filter results by category or type
-- Export data in JSON, CSV, or Excel formats
-- Control output volume with configurable result limits
+- Extracts data from Chicago's official Socrata API (data.cityofchicago.org)
+- Supports flexible filtering by date range, facility type, business name, risk level, and inspection results
+- Includes detailed violation information and geolocation data
+- Returns structured data with cleaned violation text and parsed coordinates
+- Rate-limited to be respectful to the city's API
 
-## Use Cases
+## Data Extracted
 
-- **Track** - Track state and local government data and permits
-- **Monitor** - Monitor regulatory filings and public records
-- **Build** - Build databases for civic tech and transparency projects
-- **Aggregate** - Aggregate local government data for community research
+Each inspection record includes:
+
+- **Business Information**: Name, alternative name, license number, facility type
+- **Location Data**: Full address, city, state, zip code, latitude/longitude
+- **Inspection Details**: Date, type, result, risk level
+- **Violations**: Both raw text and parsed violation array
+- **Metadata**: Unique inspection ID and scrape timestamp
 
 ## Input Parameters
 
-| Parameter | Type | Description | Default |
-| --- | --- | --- | --- |
-| `facilityType` | string | Filter by facility type (e.g., 'Restaurant', 'Grocery Store', 'Bakery') |  |
-| `riskLevel` | string | Filter by risk level | `` |
-| `results` | string | Filter by inspection result | `` |
-| `startDate` | string | Filter inspections on or after this date (YYYY-MM-DD format) |  |
-| `endDate` | string | Filter inspections on or before this date (YYYY-MM-DD format) |  |
-| `maxItems` | integer | Maximum number of inspection records to fetch | `1000` |
+- **Start Date**: Filter inspections from this date (YYYY-MM-DD)
+- **End Date**: Filter inspections until this date (YYYY-MM-DD)
+- **Facility Type**: Filter by business type (e.g., "Restaurant", "Grocery Store")
+- **Business Name**: Search for specific business names (partial matching)
+- **Risk Level**: Filter by risk category (High, Medium, Low)
+- **Inspection Result**: Filter by outcome (Pass, Fail, Pass w/ Conditions, etc.)
+- **Max Items**: Limit the number of records returned (default: 1000, max: 50000)
 
-## Output Example
+## Use Cases
 
-Each result contains structured data like this:
+- **Compliance Monitoring**: Track inspection history for specific businesses
+- **Market Research**: Analyze food safety trends across different facility types
+- **Consumer Protection**: Identify businesses with recent violations
+- **Data Analytics**: Perform statistical analysis of food safety patterns
+- **Due Diligence**: Research potential business partners or acquisitions
+
+## Data Source
+
+This actor uses Chicago's official Open Data API:
+
+- **Source**: City of Chicago Data Portal
+- **Dataset**: Food Inspections (ID: 4ijn-s7e5)
+- **Update Frequency**: Daily
+- **API**: Socrata SODA API
+
+## Rate Limits
+
+The actor includes built-in rate limiting (100ms between requests) to ensure respectful API usage.
+
+## Output Format
+
+Data is returned in JSON format with the following structure:
 
 ```
 {
-  "inspection_id": "ABC-12345",
-  "dba_name": "Chicago Food Inspections Sample Item",
-  "aka_name": "Chicago Food Inspections Sample Item",
-  "license_": "Sample license_",
-  "facility_type": "Sample facility_type",
-  "risk": "Sample risk",
+  "inspectionId": "123456",
+  "businessName": "EXAMPLE RESTAURANT",
+  "alternativeName": "Example Rest",
+  "licenseNumber": "987654",
+  "facilityType": "Restaurant",
+  "riskLevel": "Risk 1 (High)",
   "address": "123 Main St",
-  "city": "San Francisco",
-  "state": "CA",
-  "zip": "94105",
-  "inspection_date": "2025-01-15",
-  "inspection_type": "Sample inspection_type"
+  "city": "CHICAGO",
+  "state": "IL",
+  "zipCode": "60601",
+  "inspectionDate": "2024-01-15T00:00:00.000",
+  "inspectionType": "Canvass",
+  "inspectionResult": "Pass",
+  "violations": ["Temperature violation", "Hand washing violation"],
+  "violationText": "Temperature violation | Hand washing violation",
+  "latitude": 41.8781,
+  "longitude": -87.6298,
+  "scrapedAt": "2024-01-16T10:30:45.123Z"
 }
 ```
 
-## Pricing
+## Legal and Ethical Use
 
-This actor uses pay-per-result pricing:
+This data is publicly available through Chicago's Open Data Portal. Users should:
 
-- **$0.001** per result
-- **$1.00** per 1,000 results
+- Verify data accuracy before making business decisions
+- Respect the original data licensing terms
+- Use responsibly and ethically
+- Not overload the city's servers
 
-No monthly fees. You only pay for what you scrape. [Apify Free plan](https://apify.com/pricing) includes $5/month in platform credits.
+## Support
 
-## How to Run
-
-### Apify Console
-
-1. Go to the [Chicago Food Inspections](https://apify.com/fortuitous_pirate/chicago-food-inspections) actor page
-2. Configure your input parameters
-3. Click **Start** and wait for the results
-4. Download data in JSON, CSV, or Excel format
-
-### API
-
-```
-curl -X POST "https://api.apify.com/v2/acts/fortuitous_pirate~chicago-food-inspections/runs?token=YOUR_API_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"maxItems": 10}'
-```
-
-### Python SDK
-
-```
-from apify_client import ApifyClient
-
-client = ApifyClient("YOUR_API_TOKEN")
-run = client.actor("fortuitous_pirate/chicago-food-inspections").call(
-    run_input={"maxItems": 10}
-)
-
-for item in client.dataset(run["defaultDatasetId"]).iterate_items():
-    print(item)
-```
-
-## Integration
-
-Connect Chicago Food Inspections with your existing tools and workflows:
-
-- **API access** - Programmatic access via [Apify API](https://docs.apify.com/api/v2)
-- **Webhooks** - Get notified when scraping completes
-- **Scheduling** - Set up recurring runs on any schedule
-- **Zapier / Make** - Connect with 5,000+ apps via [Apify integrations](https://apify.com/integrations)
-- **Python / Node.js SDKs** - Native client libraries for easy integration
+For issues or questions about this actor, please contact the developer or check the Apify marketplace for updates.
